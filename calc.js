@@ -5,6 +5,20 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", () => {
       const char = button.textContent;
       const current = display.textContent;
+      let openEquation = "";
+      let operator = "";
+      let closeEquation = "";
+      let result = "";
+
+
+      if (operator ==="") {
+        openEquation += char;
+        display.textContent = openEquation;} 
+        else
+        {closeEquation += char;
+          display.textContent = closeEquation;
+        } 
+      
 
     if (current === "0" && char === "0") {return;}
 
