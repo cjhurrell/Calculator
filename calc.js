@@ -1,43 +1,61 @@
+let openEquation = "";
+let operator = "";
+let closeEquation = "";
+let result = "";
+
 document.addEventListener("DOMContentLoaded", () => {
   const display = document.querySelector(".display");
 
-  document.querySelectorAll("button:not(#clear):not(#back)").forEach(button => {
+  function calc(a, op, b) {
+    const x = parseFloat(a);
+    const y = parseFloat(b);
+
+    switch (op) {
+      case "+": return x + y;
+      case "-": return x - y;
+      case "*": return x * y;
+      case "/": return y !== 0 ? x / y : "error";
+      default: return "error"
+        
+    }
+  }
+
+
+
+  document.querySelectorAll("button:not(#clear):not(#back):not(.operator)").forEach(button => {
     button.addEventListener("click", () => {
       const char = button.textContent;
-      const current = display.textContent;
-      let openEquation = "";
-      let operator = "";
-      let closeEquation = "";
-      let result = "";
+  
 
-
-      if (operator ==="") {
+      if (!operator) {
         openEquation += char;
         display.textContent = openEquation;} 
         else
         {closeEquation += char;
           display.textContent = closeEquation;
         } 
+      });
+    });
       
-
-    if (current === "0" && char === "0") {return;}
-
-    if (current === "0") {
-      display.textContent = char;} else{ display.textContent += char; }
-    });
-    
-    });
+document.querySelectorAll(".operator").forEach(btn => {
+  btn.addEventListener("click", (event) => {
+    operator = event.target.textContent
   });
-
+});
 
 document.querySelector("#clear").addEventListener("click", () => {
-  const display = document.querySelector(".display");
   display.textContent = "0";
+  openEquation = "";
+  operator = "";
+  closeEquation = "";
+  result = "";
 });
 
 document.querySelector("#back").addEventListener("click", () => {
-  const display = document.querySelector(".display");
   display.textContent = display.textContent.slice(0, -1) || "0";
 });
+});
+   
+
 
 
