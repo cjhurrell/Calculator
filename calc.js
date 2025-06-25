@@ -13,8 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
     switch (op) {
       case "+": return x + y;
       case "-": return x - y;
-      case "*": return x * y;
-      case "/": return y !== 0 ? x / y : "error";
+      case "x": return x * y;
+      case "÷": return y !== 0 ? x / y : "error";
       default: return "error"
         
     }
@@ -54,6 +54,20 @@ document.querySelector("#clear").addEventListener("click", () => {
 document.querySelector("#back").addEventListener("click", () => {
   display.textContent = display.textContent.slice(0, -1) || "0";
 });
+
+
+document.querySelector("#equals").addEventListener("click", () => {
+  if (openEquation !== "" && operator !== "" && closeEquation !== "") {
+    result = calc(openEquation, operator, closeEquation);
+    display.textContent = result;
+
+    // Reset logic to support chaining
+    openEquation = result.toString();
+    operator = "";
+    closeEquation = "";
+  }
+});
+
 });
    
 
