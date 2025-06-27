@@ -15,7 +15,7 @@ function safeEval(expr) {
   // Replace symbols to JS-friendly
   expr = expr.replace(/x/g, "*").replace(/÷/g, "/");
 
-
+  
   try {
     const result = Function("return " + expr)();
     return result;
@@ -27,13 +27,14 @@ function safeEval(expr) {
 document.addEventListener("DOMContentLoaded", () => {
   updateDisplay("0");
 
-  document.querySelectorAll(".btn, .operator, #decimal").forEach(button => {
+  document.querySelectorAll(".btn, .operator, #decimal, #brac").forEach(button => {
     button.addEventListener("click", () => {
       const char = button.textContent;
 
-      if (justEvaluated && !isOperator(char)) {
-        // Start new expression after result if input is number/decimal
-        expression = "";
+      if (justEvaluated) {
+        if (!isOperator(char) && char !== "(") {
+          expression = "";
+        }
         justEvaluated = false;
       }
 
@@ -43,7 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (char === "%") {
-        // Convert last number to percent
         const match = expression.match(/(\d+(?:\.\d+)?)$/);
         if (match) {
           const percentValue = parseFloat(match[1]) / 100;
@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (char === "()") {
-        // Basic bracket toggle
+        // Explicit toggle from the bracket button
         const openCount = (expression.match(/\(/g) || []).length;
         const closeCount = (expression.match(/\)/g) || []).length;
         expression += openCount > closeCount ? ")" : "(";
@@ -90,7 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-   
 
 
 
