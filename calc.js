@@ -1,74 +1,95 @@
-let openEquation = "";
-let operator = "";
-let closeEquation = "";
-let result = "";
+
+let expression = "";
+let justEvaluated = false;
+
+function updateDisplay(content) {
+  const display = document.querySelector(".display");
+  display.textContent = content || "0";
+}
+
+function isOperator(char) {
+  return ["+", "-", "x", "÷"].includes(char);
+}
+
+function safeEval(expr) {
+  // Replace symbols to JS-friendly
+  expr = expr.replace(/x/g, "*").replace(/÷/g, "/");
+
+
+  try {
+    const result = Function("return " + expr)();
+    return result;
+  } catch {
+    return "Error";
+  }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
-  const display = document.querySelector(".display");
+  updateDisplay("0");
 
-  function calc(a, op, b) {
-    const x = parseFloat(a);
-    const y = parseFloat(b);
-
-    switch (op) {
-      case "+": return x + y;
-      case "-": return x - y;
-      case "x": return x * y;
-      case "÷": return y !== 0 ? x / y : "error";
-      default: return "error"
-        
-    }
-  }
-
-
-
-  document.querySelectorAll("button:not(#clear):not(#back):not(.operator)").forEach(button => {
+  document.querySelectorAll(".btn, .operator, #decimal").forEach(button => {
     button.addEventListener("click", () => {
       const char = button.textContent;
-  
 
-      if (!operator) {
-        openEquation += char;
-        display.textContent = openEquation;} 
-        else
-        {closeEquation += char;
-          display.textContent = closeEquation;
-        } 
-      });
+      if (justEvaluated && !isOperator(char)) {
+        // Start new expression after result if input is number/decimal
+        expression = "";
+        justEvaluated = false;
+      }
+
+      if (char === ".") {
+        const lastPart = expression.split(/[-+x÷()]/).pop();
+        if (lastPart.includes(".")) return; // Prevent multiple decimals
+      }
+
+      if (char === "%") {
+        // Convert last number to percent
+        const match = expression.match(/(\d+(?:\.\d+)?)$/);
+        if (match) {
+          const percentValue = parseFloat(match[1]) / 100;
+          expression = expression.slice(0, -match[1].length) + percentValue;
+        }
+        updateDisplay(expression);
+        return;
+      }
+
+      if (char === "()") {
+        // Basic bracket toggle
+        const openCount = (expression.match(/\(/g) || []).length;
+        const closeCount = (expression.match(/\)/g) || []).length;
+        expression += openCount > closeCount ? ")" : "(";
+      } else {
+        expression += char;
+      }
+
+      updateDisplay(expression);
     });
-      
-document.querySelectorAll(".operator").forEach(btn => {
-  btn.addEventListener("click", (event) => {
-    operator = event.target.textContent
+  });
+
+  document.querySelector("#equals").addEventListener("click", () => {
+    const result = safeEval(expression);
+    updateDisplay(result);
+    expression = result.toString();
+    justEvaluated = true;
+  });
+
+  document.querySelector("#clear").addEventListener("click", () => {
+    expression = "";
+    justEvaluated = false;
+    updateDisplay("0");
+  });
+
+  document.querySelector("#back").addEventListener("click", () => {
+    if (justEvaluated) {
+      expression = "";
+      justEvaluated = false;
+    } else {
+      expression = expression.slice(0, -1);
+    }
+    updateDisplay(expression);
   });
 });
 
-document.querySelector("#clear").addEventListener("click", () => {
-  display.textContent = "0";
-  openEquation = "";
-  operator = "";
-  closeEquation = "";
-  result = "";
-});
-
-document.querySelector("#back").addEventListener("click", () => {
-  display.textContent = display.textContent.slice(0, -1) || "0";
-});
-
-
-document.querySelector("#equals").addEventListener("click", () => {
-  if (openEquation !== "" && operator !== "" && closeEquation !== "") {
-    result = calc(openEquation, operator, closeEquation);
-    display.textContent = result;
-
-    // Reset logic to support chaining
-    openEquation = result.toString();
-    operator = "";
-    closeEquation = "";
-  }
-});
-
-});
    
 
 
